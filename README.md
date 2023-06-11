@@ -139,7 +139,30 @@ If the user was created after some tables were created in the database, then nee
 GRANT ALL ON commercedb.* TO kenshin;
 ```
 
+## Deploy into Cloud Run
+Installing gcloud CLI.
+
 ## Things to take care of
+[x] Create a basic server
+    [x] Add basic routing
+    [x] Add basic logging
+    [x] Setup graceful shutdown
+        [x] Run the server on its own goroutine
+        [x] Have the main process listen for interrup or kill signals
+        [x] Configure graceful shutdown steps
+    [ ] Properly manage the end to end contexts (server and database)
+    [ ] Properly manage server setup (timeouts, etc.)
+[x] Create a basic storage layer
+    [x] Add an in memory data store
+    [x] Add basic database and its connection
+[x] Setup basic testing
+    [x] Test the server handlers
+    [x] Be able to mock the database
+[ ] Deploy into Cloud Run
+    [ ] Manual deploy the server into Cloud Run
+    [ ] Setup a database in the cloud
+    [ ] Automatically deploy the server from a CI/CD pipeline
+
 
 ### User management
 1. How to setup authentication
