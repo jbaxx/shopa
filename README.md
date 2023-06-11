@@ -91,6 +91,49 @@ type CommerceServer struct {
 func NewCommerceServer(store db.CommerceStore, port string) *CommerceServer {
 ```
 
+## Database
+Let's use cockroachdb
+
+Create a volume named roach
+```
+docker volume create roach
+```
+
+Create a bridge network named mynet
+```
+docker network create -d bridge mynet
+```
+
+Start the database container
+```
+docker run -d \
+  --name roach \
+  --hostname db \
+  --network mynet \
+  -p 26257:26257 \
+  -p 8080:8080 \
+  -v roach:/cockroach/cockroach-data \
+  cockroachdb/cockroach:latest-v20.1 start-single-node \
+  --insecure
+```
+
+Access the database
+```
+docker exec -it roach ./cockroach sql --insecure
+```
+
+To create the database and the tables look at the `init.sql` file.
+
+Create a user
+```
+CREATE USER kenshin;
+```
+
+Grant all permission to this user (for testing only):
+```
+GRANT ALL ON DATABASE commercedb TO kenshin;
+```
+
 ## Things to take care of
 
 ### User management
