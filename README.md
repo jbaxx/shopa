@@ -134,6 +134,11 @@ Grant all permission to this user (for testing only):
 GRANT ALL ON DATABASE commercedb TO kenshin;
 ```
 
+If the user was created after some tables were created in the database, then need to use wildcard to apply retroactively.
+```
+GRANT ALL ON commercedb.* TO kenshin;
+```
+
 ## Things to take care of
 
 ### User management

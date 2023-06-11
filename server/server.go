@@ -34,6 +34,7 @@ func NewCommerceServer(store db.CommerceStore, port string, l *log.Logger) *Comm
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  15 * time.Second,
+		ErrorLog:     l,
 		Handler:      router,
 	}
 
