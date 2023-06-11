@@ -54,7 +54,6 @@ id: integer,
 sku: string,
 name: integer,
 cost: float,
-quantity: integer,
 created_at: timestamp,
 updated_at: timestamp,
 ```
