@@ -74,13 +74,22 @@ type CommerceStore interface {
     GetItem(id int) Item
 }
 
+// For local try-it-out we implement an InMemoryCommerceStore
+type InMemoryCommerceStore struct {
+	mu     sync.Mutex
+	chains map[string]Chain
+}
+
 // CommerceServer will be the server.
 // It hosts the data store as an interface (which allows to add any implementation).
 // It hosts a Handler interface so it can handle any handler.
 type CommerceServer struct {
     store CommerceStore
-    http.Handler
+    server *http.Server
 }
+
+// Initializes the server and can receive any store type
+func NewCommerceServer(store db.CommerceStore, port string) *CommerceServer {
 ```
 
 ## Things to take care of

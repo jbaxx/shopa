@@ -9,7 +9,7 @@ type CommerceStore interface {
 }
 
 type Chain struct {
-	Id        *int       `json:"id"`
+	Id        *string    `json:"id"`
 	Name      *string    `json:"name,omitempty"`
 	Phone     *string    `json:"phone,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`

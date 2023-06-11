@@ -15,15 +15,16 @@ import (
 const ContentApplicationJSON = "application/json"
 
 type CommerceServer struct {
-	store db.CommerceStore
-	// http.Handler
+	store  db.CommerceStore
 	server *http.Server
+	l      *log.Logger
 }
 
-func NewCommerceServer(store db.CommerceStore, port string) *CommerceServer {
+func NewCommerceServer(store db.CommerceStore, port string, l *log.Logger) *CommerceServer {
 	cs := new(CommerceServer)
 
 	cs.store = store
+	cs.l = l
 
 	router := http.NewServeMux()
 	router.Handle("/chains", http.HandlerFunc(cs.chainsHandler))
@@ -42,15 +43,16 @@ func NewCommerceServer(store db.CommerceStore, port string) *CommerceServer {
 }
 
 func (c *CommerceServer) chainsHandler(w http.ResponseWriter, r *http.Request) {
+	c.l.Println("Handle GET /chains")
 	w.Header().Set("content-type", ContentApplicationJSON)
 	json.NewEncoder(w).Encode(c.store.GetChains())
 }
 
 func (c *CommerceServer) Run(port string) {
 	go func() {
-		log.Printf("Starting server at port: %s", port)
+		c.l.Printf("Starting server at port: %s", port)
 		if err := c.server.ListenAndServe(); err != nil {
-			log.Println(err)
+			c.l.Println(err)
 		}
 	}()
 
@@ -59,10 +61,10 @@ func (c *CommerceServer) Run(port string) {
 	signal.Notify(is, os.Kill)
 
 	sig := <-is
-	log.Printf("got signal %v, shuting down gracefully", sig)
+	c.l.Printf("got signal %v, shuting down gracefully", sig)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	c.server.Shutdown(ctx)
-	log.Println("Shut down")
+	c.l.Println("Shut down")
 }
