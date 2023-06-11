@@ -44,7 +44,7 @@ func NewCommerceServer(store db.CommerceStore, port string, l *log.Logger) *Comm
 }
 
 func (c *CommerceServer) chainsHandler(w http.ResponseWriter, r *http.Request) {
-	c.l.Println("Handle GET /chains")
+	c.l.Println("GET /chains")
 	w.Header().Set("content-type", ContentApplicationJSON)
 	json.NewEncoder(w).Encode(c.store.GetChains())
 }
