@@ -142,6 +142,27 @@ GRANT ALL ON commercedb.* TO kenshin;
 ## Deploy into Cloud Run
 Installing gcloud CLI.
 
+Deploying the current directory as source
+```
+gcloud run deploy
+```
+
+Authenticating to Cloud Run with the logged in user: https://cloud.google.com/run/docs/authenticating/developers#curl
+```
+curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://shopa-sfy2ragm5a-uc.a.run.app/chains
+```
+
+## Docker
+Build the image
+```
+docker build --progress plain --no-cache --tag shopa -f Dockerfile .
+```
+
+Run the image, and specifying environment variables
+```
+docker run --publish 5000:5000 -e PORT=5000 shopa
+```
+
 ## Things to take care of
 [x] Create a basic server
     [x] Add basic routing
