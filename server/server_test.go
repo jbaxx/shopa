@@ -10,8 +10,8 @@ import (
 	"os"
 	"testing"
 
-	"gg.rocks/shopa/db"
 	"github.com/google/go-cmp/cmp"
+	"github.com/jbaxx/shopa/db"
 )
 
 type StubCommerceStore struct {

@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"gg.rocks/shopa/db"
-	"gg.rocks/shopa/server"
+	"github.com/jbaxx/shopa/db"
+	"github.com/jbaxx/shopa/server"
 )
 
 func main() {

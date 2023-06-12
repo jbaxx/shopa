@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"time"
 
-	"gg.rocks/shopa/db"
+	"github.com/jbaxx/shopa/db"
 )
 
 const ContentApplicationJSON = "application/json"

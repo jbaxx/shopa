@@ -1,4 +1,4 @@
-module gg.rocks/shopa
+module github.com/jbaxx/shopa
 
 go 1.19
 
