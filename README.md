@@ -168,26 +168,38 @@ Image URL
 us-central1-docker.pkg.dev/thejam/cloud-run-source-deploy/shopa:latest
 ```
 
+Build locally and pushing using Docker: https://cloud.google.com/run/docs/building/containers#docker
+
+Build
+```
+docker build --progress plain --no-cache --tag shopa -f Dockerfile . --tag us-central1-docker.pkg.dev/thejam/cloud-run-source-deploy/shopa:latest
+```
+
+Push: https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling?authuser=1#pushing
+```
+docker push us-central1-docker.pkg.dev/thejam/cloud-run-source-deploy/shopa:latest
+```
+
 ## Things to take care of
-[x] Create a basic server
-    [x] Add basic routing
-    [x] Add basic logging
-    [x] Setup graceful shutdown
-        [x] Run the server on its own goroutine
-        [x] Have the main process listen for interrup or kill signals
-        [x] Configure graceful shutdown steps
-    [ ] Properly manage the end to end contexts (server and database)
-    [ ] Properly manage server setup (timeouts, etc.)
-[x] Create a basic storage layer
-    [x] Add an in memory data store
-    [x] Add basic database and its connection
-[x] Setup basic testing
-    [x] Test the server handlers
-    [x] Be able to mock the database
-[ ] Deploy into Cloud Run
-    [ ] Manual deploy the server into Cloud Run
-    [ ] Setup a database in the cloud
-    [ ] Automatically deploy the server from a CI/CD pipeline
+- [x] Create a basic server
+    - [x] Add basic routing
+    - [x] Add basic logging
+    - [x] Setup graceful shutdown
+        - [x] Run the server on its own goroutine
+        - [x] Have the main process listen for interrup or kill signals
+        - [x] Configure graceful shutdown steps
+    - [ ] Properly manage the end to end contexts (server and database)
+    - [ ] Properly manage server setup (timeouts, etc.)
+- [x] Create a basic storage layer
+    - [x] Add an in memory data store
+    - [x] Add basic database and its connection
+- [x] Setup basic testing
+    - [x] Test the server handlers
+    - [x] Be able to mock the database
+- [ ] Deploy into Cloud Run
+    - [ ] Manual deploy the server into Cloud Run
+    - [ ] Setup a database in the cloud
+    - [ ] Automatically deploy the server from a CI/CD pipeline
 
 
 ### User management
@@ -219,8 +231,3 @@ us-central1-docker.pkg.dev/thejam/cloud-run-source-deploy/shopa:latest
 
 ### Load Testing
 1. How to load test the server (`https://github.com/bojand/ghz`)
-
-
-
-
-
