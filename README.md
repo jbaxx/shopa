@@ -139,8 +139,19 @@ If the user was created after some tables were created in the database, then nee
 GRANT ALL ON commercedb.* TO kenshin;
 ```
 
+## Docker
+Build the image
+```
+docker build --progress plain --no-cache --tag shopa -f Dockerfile .
+```
+
+Run the image, and specifying environment variables
+```
+docker run --publish 5000:5000 -e PORT=5000 shopa
+```
+
 ## Deploy into Cloud Run
-Installing gcloud CLI.
+Setup Google Cloud Run for local development: https://cloud.google.com/run/docs/setup
 
 Deploying the current directory as source
 ```
@@ -152,15 +163,9 @@ Authenticating to Cloud Run with the logged in user: https://cloud.google.com/ru
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://shopa-sfy2ragm5a-uc.a.run.app/chains
 ```
 
-## Docker
-Build the image
+Image URL
 ```
-docker build --progress plain --no-cache --tag shopa -f Dockerfile .
-```
-
-Run the image, and specifying environment variables
-```
-docker run --publish 5000:5000 -e PORT=5000 shopa
+us-central1-docker.pkg.dev/thejam/cloud-run-source-deploy/shopa:latest
 ```
 
 ## Things to take care of
