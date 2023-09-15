@@ -3,31 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"dagger.io/dagger"
 )
 
 func main() {
-
 	ctx := context.Background()
-
-	err := build(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	test(ctx)
 }
 
-func build(ctx context.Context) error {
-	fmt.Println("Building with Dagger")
+func test(ctx context.Context) error {
+	fmt.Println("Testing with Dagger")
 
-	// define build matrix
-	oses := []string{"linux", "darwin"}
-	arches := []string{"amd64", "arm64"}
+	goVersions := []string{"1.20", "1.21"}
 
-	// initialize Dagger client
 	client, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stderr))
 	if err != nil {
 		return err
@@ -37,40 +27,47 @@ func build(ctx context.Context) error {
 	// get reference to the local project
 	src := client.Host().Directory(".")
 
-	// create empty directory to put the build outputs
-	outputs := client.Directory()
+	for _, version := range goVersions {
+		imageTag := fmt.Sprintf("golang:%s", version)
+		golang := client.Container().From(imageTag)
 
-	golang := client.Container().From("golang:latest")
+		// mount local project into the golang image
+		golang = golang.WithDirectory("/app", src)
 
-	// mount cloned repository into `golang` image
-	golang = golang.WithDirectory("/app", src).WithWorkdir("/app")
-
-	for _, goos := range oses {
-		for _, goarch := range arches {
-			// create a directory for each os and arch
-			path := fmt.Sprintf("build/%s/%s/", goos, goarch)
-
-			// set GOARCH and GOOS in the build environment
-			build := golang.WithEnvVariable("GOOS", goos)
-			build = build.WithEnvVariable("GOARCH", goarch)
-
-			// build application
-			build = build.WithExec([]string{"go", "build", "-v", "-o", path})
-
-			// get reference to build output directory in container
-			// WithDirectory write a directory at the given path,
-			// with the contents of the passed dir.
-			// Directory retrieves a directory.
-			// This is creating new paths (to build the tree),
-			// with the contents of the current build path.
-			outputs = outputs.WithDirectory(path, build.Directory(path))
+		// install dependencies
+		runner := golang.WithWorkdir("/app")
+		out, err := runner.WithExec([]string{"go", "mod", "download"}).Stderr(ctx)
+		if err != nil {
+			return err
 		}
-	}
+		fmt.Println(out)
 
-	// write build artifacts to host
-	_, err = outputs.Export(ctx, ".")
-	if err != nil {
-		return err
+		// run tests
+		test := runner.WithWorkdir("/app")
+		out, err = test.WithExec([]string{"go", "test", "./..."}).Stderr(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Println(out)
+
+		// run vulnerability checks
+		vuln := test.WithWorkdir("/app")
+		out, err = vuln.WithExec([]string{
+			"go",
+			"install",
+			"golang.org/x/vuln/cmd/govulncheck@latest",
+		}).Stderr(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Println(out)
+
+		out, err = test.WithExec([]string{"govulncheck", "./..."}).Stderr(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Println(out)
+
 	}
 
 	return nil
