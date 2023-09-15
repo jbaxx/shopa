@@ -38,15 +38,15 @@ func test(ctx context.Context) error {
 
 	for _, version := range goVersions {
 		imageTag := fmt.Sprintf("golang:%s", version)
-		golang := client.Container().From(imageTag).WithMountedCache("/app/node", depCache)
+		golang := client.Container().From(imageTag)
 
 		// mount local project into the golang image
 		golang = golang.WithDirectory(workDir, src).
-			WithWorkdir(workDir)
-			// WithEnvVariable("GOPATH", "/go").
-			// WithEnvVariable("PATH", "$PATH:$GOPATH/bin", dagger.ContainerWithEnvVariableOpts{
-			// 	Expand: true,
-			// }).
+			WithWorkdir(workDir).
+			WithMountedCache("/app/node", depCache).
+			WithEnvVariable("GOBIN", "$GOPATH/bin", dagger.ContainerWithEnvVariableOpts{
+				Expand: true,
+			})
 			// WithEnvVariable("PATH", "$PATH:$HOME/go/bin", dagger.ContainerWithEnvVariableOpts{
 			// 	Expand: true,
 			// })
