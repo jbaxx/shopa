@@ -63,7 +63,6 @@ func test(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("dagger dependencies install: %w", err)
 		}
-		// fmt.Println(out)
 
 		// run tests
 		test := runner.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
@@ -71,7 +70,6 @@ func test(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("dagger tests: %w", err)
 		}
-		// fmt.Println(out)
 
 		// run vulnerability checks
 		vuln := test.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
@@ -83,7 +81,6 @@ func test(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
-		// fmt.Println(out)
 
 		dir = golang.Directory("/go/bin")
 		e, err = dir.Entries(ctx)
@@ -92,35 +89,25 @@ func test(ctx context.Context) error {
 		}
 		fmt.Printf("Contents of /go/bin dir:\n%s\n", e)
 
-		_, err = vuln.WithExec([]string{"sh", "-c", "which", "govulncheck"}).Stdout(ctx)
-		if err != nil {
-			return fmt.Errorf("dagger govulncheck install: %w", err)
-		}
-		// fmt.Println("go env: ", out)
-
 		_, err = vuln.WithExec([]string{"go", "env"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
-		// fmt.Println("go env: ", out)
 
 		_, err = vuln.WithExec([]string{"sh", "-c", "echo", "$PATH"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
-		// fmt.Println("PATH: ", out)
 
 		_, err = vuln.WithExec([]string{"sh", "-c", "echo", "$GOPATH"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
-		// fmt.Println("GOPATH", out)
 
 		_, err = test.WithExec([]string{"govulncheck", "./..."}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck: %w", err)
 		}
-		// fmt.Println(out)
 
 	}
 
