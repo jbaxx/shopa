@@ -43,10 +43,10 @@ func test(ctx context.Context) error {
 		// mount local project into the golang image
 		golang = golang.WithDirectory(workDir, src).
 			WithWorkdir(workDir).
-			WithMountedCache("/app/node", depCache).
-			WithEnvVariable("GOBIN", "$GOPATH/bin", dagger.ContainerWithEnvVariableOpts{
-				Expand: true,
-			})
+			WithMountedCache("/app/node", depCache)
+			// WithEnvVariable("GOBIN", "$GOPATH/bin", dagger.ContainerWithEnvVariableOpts{
+			// 	Expand: true,
+			// })
 			// WithEnvVariable("PATH", "$PATH:$HOME/go/bin", dagger.ContainerWithEnvVariableOpts{
 			// 	Expand: true,
 			// })
@@ -78,6 +78,7 @@ func test(ctx context.Context) error {
 
 		// run vulnerability checks
 		_, err = golang.WithExec([]string{
+			"GOBIN=/usr/local/bin/",
 			"go",
 			"install",
 			"golang.org/x/vuln/cmd/govulncheck@latest",
@@ -121,12 +122,6 @@ func test(ctx context.Context) error {
 			return err
 		}
 		fmt.Printf("Contents of /usr/local/go/bin dir:\n%s\n", dirs)
-
-		dirs, err = golang.Directory("/bin").Entries(ctx)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("Contents of /bin dir:\n%s\n", dirs)
 
 		_, err = golang.WithExec([]string{"go", "env"}).Stdout(ctx)
 		if err != nil {
