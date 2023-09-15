@@ -64,6 +64,12 @@ func test(ctx context.Context) error {
 			return fmt.Errorf("dagger dependencies install: %w", err)
 		}
 
+		// install dependencies
+		_, err = runner.WithExec([]string{"go", "mod", "tidy"}).Stdout(ctx)
+		if err != nil {
+			return fmt.Errorf("dagger dependencies install: %w", err)
+		}
+
 		// run tests
 		test := runner.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
 		_, err = test.WithExec([]string{"go", "test", "./..."}).Stderr(ctx)
@@ -94,6 +100,12 @@ func test(ctx context.Context) error {
 		}
 		fmt.Printf("Contents of /go dir:\n%s\n", dirs)
 
+		dirs, err = vuln.Directory("/go/bin").Entries(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Contents of /go/bin dir:\n%s\n", dirs)
+
 		dirs, err = vuln.Directory("/home").Entries(ctx)
 		if err != nil {
 			return err
@@ -105,15 +117,11 @@ func test(ctx context.Context) error {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
 
-		_, err = vuln.WithExec([]string{"sh", "-c", "echo", "$PATH"}).Stdout(ctx)
+		path, err := vuln.EnvVariable(ctx, "PATH")
 		if err != nil {
-			return fmt.Errorf("dagger govulncheck install: %w", err)
+			return err
 		}
-
-		_, err = vuln.WithExec([]string{"sh", "-c", "echo", "$GOPATH"}).Stdout(ctx)
-		if err != nil {
-			return fmt.Errorf("dagger govulncheck install: %w", err)
-		}
+		fmt.Println("PATH: ", path)
 
 		_, err = test.WithExec([]string{"govulncheck", "./..."}).Stderr(ctx)
 		if err != nil {
