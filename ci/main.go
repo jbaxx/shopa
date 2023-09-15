@@ -82,12 +82,23 @@ func test(ctx context.Context) error {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
 
-		dir = golang.Directory("/go/bin")
-		e, err = dir.Entries(ctx)
+		dirs, err := vuln.Directory("/").Entries(ctx)
 		if err != nil {
-			return fmt.Errorf("dagger entries: %w", err)
+			return err
 		}
-		fmt.Printf("Contents of /go/bin dir:\n%s\n", e)
+		fmt.Printf("Contents of / dir:\n%s\n", dirs)
+
+		dirs, err = vuln.Directory("/go").Entries(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Contents of /go dir:\n%s\n", dirs)
+
+		dirs, err = vuln.Directory("/home").Entries(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Contents of /home dir:\n%s\n", dirs)
 
 		_, err = vuln.WithExec([]string{"go", "env"}).Stdout(ctx)
 		if err != nil {
