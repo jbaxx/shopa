@@ -56,23 +56,23 @@ func test(ctx context.Context) error {
 
 		// install dependencies
 		runner := golang.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
-		out, err := runner.WithExec([]string{"go", "mod", "download"}).Stderr(ctx)
+		_, err = runner.WithExec([]string{"go", "mod", "download"}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger dependencies install: %w", err)
 		}
-		fmt.Println(out)
+		// fmt.Println(out)
 
 		// run tests
 		test := runner.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
-		out, err = test.WithExec([]string{"go", "test", "./..."}).Stderr(ctx)
+		_, err = test.WithExec([]string{"go", "test", "./..."}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger tests: %w", err)
 		}
-		fmt.Println(out)
+		// fmt.Println(out)
 
 		// run vulnerability checks
 		vuln := test.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
-		out, err = vuln.WithExec([]string{
+		_, err = vuln.WithExec([]string{
 			"go",
 			"install",
 			"golang.org/x/vuln/cmd/govulncheck@latest",
@@ -80,7 +80,7 @@ func test(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
-		fmt.Println(out)
+		// fmt.Println(out)
 
 		dir = golang.Directory("/go/bin")
 		e, err = dir.Entries(ctx)
@@ -89,29 +89,35 @@ func test(ctx context.Context) error {
 		}
 		fmt.Printf("Contents of /go/bin dir:\n%s\n", e)
 
-		out, err = vuln.WithExec([]string{"go", "env"}).Stdout(ctx)
+		_, err = vuln.WithExec([]string{"sh", "-c", "which", "govulncheck"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
-		fmt.Println("go env: ", out)
+		// fmt.Println("go env: ", out)
 
-		out, err = vuln.WithExec([]string{"sh", "-c", "echo", "$PATH"}).Stdout(ctx)
+		_, err = vuln.WithExec([]string{"go", "env"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
-		fmt.Println("PATH: ", out)
+		// fmt.Println("go env: ", out)
 
-		out, err = vuln.WithExec([]string{"sh", "-c", "echo", "$GOPATH"}).Stdout(ctx)
+		_, err = vuln.WithExec([]string{"sh", "-c", "echo", "$PATH"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
-		fmt.Println("GOPATH", out)
+		// fmt.Println("PATH: ", out)
 
-		out, err = test.WithExec([]string{"govulncheck", "./..."}).Stderr(ctx)
+		_, err = vuln.WithExec([]string{"sh", "-c", "echo", "$GOPATH"}).Stdout(ctx)
+		if err != nil {
+			return fmt.Errorf("dagger govulncheck install: %w", err)
+		}
+		// fmt.Println("GOPATH", out)
+
+		_, err = test.WithExec([]string{"govulncheck", "./..."}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck: %w", err)
 		}
-		fmt.Println(out)
+		// fmt.Println(out)
 
 	}
 
