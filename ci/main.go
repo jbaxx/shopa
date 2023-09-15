@@ -120,11 +120,17 @@ func test(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Contents of /usr/local/go/bin 64dir:\n%s\n", dirs)
+		fmt.Printf("Contents of /usr/local/go/bin dir:\n%s\n", dirs)
+
+		dirs, err = golang.Directory("/bin").Entries(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Contents of /bin dir:\n%s\n", dirs)
 
 		_, err = golang.WithExec([]string{"go", "env"}).Stdout(ctx)
 		if err != nil {
-			return fmt.Errorf("dagger govulncheck install: %w", err)
+			return err
 		}
 
 		path, err := golang.EnvVariable(ctx, "PATH")
