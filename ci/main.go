@@ -43,7 +43,9 @@ func test(ctx context.Context) error {
 		// mount local project into the golang image
 		golang = golang.WithDirectory(workDir, src).
 			// WithEnvVariable("GOPATH", "/go").
-			WithEnvVariable("PATH", "$PATH:$GOPATH/bin")
+			WithEnvVariable("PATH", "$PATH:$GOPATH/bin", dagger.ContainerWithEnvVariableOpts{
+				Expand: true,
+			})
 
 		dir := golang.Directory("/go/bin")
 		e, err := dir.Entries(ctx)
