@@ -53,7 +53,7 @@ func test(ctx context.Context) error {
 		fmt.Printf("Contents of work dir %s:\n%s\n", workDir, e)
 
 		// install dependencies
-		runner := golang.WithWorkdir(workDir)
+		runner := golang.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
 		out, err := runner.WithExec([]string{"go", "mod", "download"}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger dependencies install: %w", err)
@@ -69,7 +69,7 @@ func test(ctx context.Context) error {
 		fmt.Println(out)
 
 		// run vulnerability checks
-		vuln := test.WithWorkdir(workDir)
+		vuln := test.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
 		out, err = vuln.WithExec([]string{
 			"go",
 			"install",
