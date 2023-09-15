@@ -45,6 +45,9 @@ func test(ctx context.Context) error {
 			// WithEnvVariable("GOPATH", "/go").
 			WithEnvVariable("PATH", "$PATH:$GOPATH/bin", dagger.ContainerWithEnvVariableOpts{
 				Expand: true,
+			}).
+			WithEnvVariable("PATH", "$PATH:$HOME/go/bin", dagger.ContainerWithEnvVariableOpts{
+				Expand: true,
 			})
 
 		dir := golang.Directory("/go/bin")
