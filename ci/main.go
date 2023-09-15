@@ -61,7 +61,7 @@ func test(ctx context.Context) error {
 		fmt.Println(out)
 
 		// run tests
-		test := runner.WithWorkdir(workDir)
+		test := runner.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
 		out, err = test.WithExec([]string{"go", "test", "./..."}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger tests: %w", err)
@@ -86,6 +86,12 @@ func test(ctx context.Context) error {
 			return fmt.Errorf("dagger entries: %w", err)
 		}
 		fmt.Printf("Contents of /go/bin dir:\n%s\n", e)
+
+		out, err = vuln.WithExec([]string{"go", "env"}).Stdout(ctx)
+		if err != nil {
+			return fmt.Errorf("dagger govulncheck install: %w", err)
+		}
+		fmt.Println("go env: ", out)
 
 		out, err = vuln.WithExec([]string{"sh", "-c", "echo", "$PATH"}).Stdout(ctx)
 		if err != nil {
