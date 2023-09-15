@@ -14,6 +14,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+
+	os.Setenv("GITHUB_STEP_SUMMARY", "## This is hello! :rocket:")
 }
 
 func test(ctx context.Context) error {
@@ -73,13 +75,13 @@ func test(ctx context.Context) error {
 		}
 		fmt.Println(out)
 
-		out, err = vuln.WithExec([]string{"echo", "$PATH"}).Stdout(ctx)
+		out, err = vuln.WithExec([]string{"sh", "-c", "echo", "$PATH"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
 		fmt.Println("PATH: ", out)
 
-		out, err = vuln.WithExec([]string{"echo", "$GOPATH"}).Stdout(ctx)
+		out, err = vuln.WithExec([]string{"sh", "-c", "echo", "$GOPATH"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
