@@ -58,28 +58,25 @@ func test(ctx context.Context) error {
 		fmt.Printf("Contents of work dir %s:\n%s\n", workDir, e)
 
 		// install dependencies
-		runner := golang.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
-		_, err = runner.WithExec([]string{"go", "mod", "download"}).Stderr(ctx)
+		_, err = golang.WithExec([]string{"go", "mod", "download"}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger dependencies install: %w", err)
 		}
 
 		// install dependencies
-		_, err = runner.WithExec([]string{"go", "mod", "tidy"}).Stdout(ctx)
+		_, err = golang.WithExec([]string{"go", "mod", "tidy"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger dependencies install: %w", err)
 		}
 
 		// run tests
-		test := runner.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
-		_, err = test.WithExec([]string{"go", "test", "./..."}).Stderr(ctx)
+		_, err = golang.WithExec([]string{"go", "test", "./..."}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger tests: %w", err)
 		}
 
 		// run vulnerability checks
-		vuln := test.WithWorkdir(workDir).WithMountedCache("/app/node", depCache)
-		_, err = vuln.WithExec([]string{
+		_, err = golang.WithExec([]string{
 			"go",
 			"install",
 			"golang.org/x/vuln/cmd/govulncheck@latest",
@@ -88,42 +85,42 @@ func test(ctx context.Context) error {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
 
-		dirs, err := vuln.Directory("/").Entries(ctx)
+		dirs, err := golang.Directory("/").Entries(ctx)
 		if err != nil {
 			return err
 		}
 		fmt.Printf("Contents of / dir:\n%s\n", dirs)
 
-		dirs, err = vuln.Directory("/go").Entries(ctx)
+		dirs, err = golang.Directory("/go").Entries(ctx)
 		if err != nil {
 			return err
 		}
 		fmt.Printf("Contents of /go dir:\n%s\n", dirs)
 
-		dirs, err = vuln.Directory("/go/bin").Entries(ctx)
+		dirs, err = golang.Directory("/go/bin").Entries(ctx)
 		if err != nil {
 			return err
 		}
 		fmt.Printf("Contents of /go/bin dir:\n%s\n", dirs)
 
-		dirs, err = vuln.Directory("/home").Entries(ctx)
+		dirs, err = golang.Directory("/home").Entries(ctx)
 		if err != nil {
 			return err
 		}
 		fmt.Printf("Contents of /home dir:\n%s\n", dirs)
 
-		_, err = vuln.WithExec([]string{"go", "env"}).Stdout(ctx)
+		_, err = golang.WithExec([]string{"go", "env"}).Stdout(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck install: %w", err)
 		}
 
-		path, err := vuln.EnvVariable(ctx, "PATH")
+		path, err := golang.EnvVariable(ctx, "PATH")
 		if err != nil {
 			return err
 		}
 		fmt.Println("PATH: ", path)
 
-		_, err = test.WithExec([]string{"govulncheck", "./..."}).Stderr(ctx)
+		_, err = golang.WithExec([]string{"govulncheck", "./..."}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck: %w", err)
 		}
