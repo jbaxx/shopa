@@ -42,15 +42,16 @@ func test(ctx context.Context) error {
 
 		// mount local project into the golang image
 		golang = golang.WithDirectory(workDir, src).
+			WithWorkdir(workDir)
 			// WithEnvVariable("GOPATH", "/go").
-			WithEnvVariable("PATH", "$PATH:$GOPATH/bin", dagger.ContainerWithEnvVariableOpts{
-				Expand: true,
-			}).
-			WithEnvVariable("PATH", "$PATH:$HOME/go/bin", dagger.ContainerWithEnvVariableOpts{
-				Expand: true,
-			})
+			// WithEnvVariable("PATH", "$PATH:$GOPATH/bin", dagger.ContainerWithEnvVariableOpts{
+			// 	Expand: true,
+			// }).
+			// WithEnvVariable("PATH", "$PATH:$HOME/go/bin", dagger.ContainerWithEnvVariableOpts{
+			// 	Expand: true,
+			// })
 
-		dir := golang.Directory("/go/bin")
+		dir := golang.Directory(workDir)
 		e, err := dir.Entries(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger entries: %w", err)
