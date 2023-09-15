@@ -41,11 +41,11 @@ func test(ctx context.Context) error {
 		golang := client.Container().From(imageTag).WithMountedCache("/app/node", depCache)
 
 		// mount local project into the golang image
-		golang = golang.WithDirectory(workDir, src).
-			WithEnvVariable("GOPATH", "/go").
-			WithEnvVariable("PATH", "$PATH:$GOPATH/bin")
+		golang = golang.WithDirectory(workDir, src)
+		// WithEnvVariable("GOPATH", "/go").
+		// WithEnvVariable("PATH", "$PATH:$GOPATH/bin")
 
-		dir := golang.Directory("/go")
+		dir := golang.Directory("/go/bin")
 		e, err := dir.Entries(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger entries: %w", err)
