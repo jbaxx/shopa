@@ -9,13 +9,14 @@ import (
 )
 
 func main() {
+	os.Setenv("GITHUB_STEP_SUMMARY", "## This is hello! :rocket:")
+
 	ctx := context.Background()
 	if err := test(ctx); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	os.Setenv("GITHUB_STEP_SUMMARY", "## This is hello! :rocket:")
 }
 
 func test(ctx context.Context) error {
@@ -30,17 +31,19 @@ func test(ctx context.Context) error {
 	}
 	defer client.Close()
 
+	depCache := client.CacheVolume("node")
+
 	// get reference to the local project
 	src := client.Host().Directory(".")
 
 	for _, version := range goVersions {
 		imageTag := fmt.Sprintf("golang:%s", version)
-		golang := client.Container().From(imageTag)
+		golang := client.Container().From(imageTag).WithMountedCache("/app/node", depCache)
 
 		// mount local project into the golang image
 		golang = golang.WithDirectory(workDir, src)
 
-		dir := golang.Directory(workDir)
+		dir := golang.Directory("/")
 		e, err := dir.Entries(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger entries: %w", err)
