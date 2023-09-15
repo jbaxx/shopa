@@ -73,6 +73,18 @@ func test(ctx context.Context) error {
 		}
 		fmt.Println(out)
 
+		out, err = vuln.WithExec([]string{"echo", "$PATH"}).Stdout(ctx)
+		if err != nil {
+			return fmt.Errorf("dagger govulncheck install: %w", err)
+		}
+		fmt.Println("PATH: ", out)
+
+		out, err = vuln.WithExec([]string{"echo", "$GOPATH"}).Stdout(ctx)
+		if err != nil {
+			return fmt.Errorf("dagger govulncheck install: %w", err)
+		}
+		fmt.Println("GOPATH", out)
+
 		out, err = test.WithExec([]string{"govulncheck", "./..."}).Stderr(ctx)
 		if err != nil {
 			return fmt.Errorf("dagger govulncheck: %w", err)
