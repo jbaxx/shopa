@@ -4,11 +4,13 @@ go 1.19
 
 require (
 	github.com/georgysavva/scany v1.2.1
+	github.com/go-chi/chi v1.5.5
 	github.com/google/go-cmp v0.5.9
 	github.com/jackc/pgx/v4 v4.18.1
 )
 
 require (
+	github.com/go-chi/chi/v5 v5.0.10 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect

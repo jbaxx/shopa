@@ -25,7 +25,7 @@ func main() {
 	if env != "dev" && env != "prod" {
 		l.Fatalf("ENV must be set to either dev or prod, set to: %s", env)
 	}
-	l.Printf("Running server in a %q environment", env)
+	l.Printf("Running server in %q environment", env)
 
 	var store db.CommerceStore
 	var err error
